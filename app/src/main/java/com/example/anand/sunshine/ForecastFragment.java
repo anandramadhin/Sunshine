@@ -16,7 +16,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -81,14 +80,9 @@ public class ForecastFragment extends Fragment {
 
         // Create some dummy data for the ListView.  Here's a sample weekly forecast
         String[] data = {
-                "Mon 6/23 - Sunny - 31/17",
-                "Tue 6/24 - Foggy - 21/8",
-                "Wed 6/25 - Cloudy - 22/17",
-                "Thurs 6/26 - Rainy - 18/11",
-                "Fri 6/27 - Foggy - 21/10",
-                "Sat 6/28 - TRAPPED IN WEATHERSTATION - 23/18",
-                "Sun 6/29 - Sunny - 20/7"
+                "Please Refresh the Feed from the menu",
         };
+
         List<String> weekForecast = new ArrayList<String>(Arrays.asList(data));
 
         // Now that we have some dummy forecast data, create an ArrayAdapter.
@@ -112,7 +106,6 @@ public class ForecastFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String forecast = mForecastAdapter.getItem(position);
 
-                Toast.makeText(getActivity(), forecast, Toast.LENGTH_SHORT).show();
 
                 //create Intent
                 Intent intent = new Intent(getActivity(), DetailActivity.class)
@@ -120,8 +113,6 @@ public class ForecastFragment extends Fragment {
                 startActivity(intent);
                             }
         });
-
-        System.out.println("Initializing System...");
         return rootView;
     }
 
@@ -225,7 +216,6 @@ public class ForecastFragment extends Fragment {
                         }
 
                             for (String s : resultStrs) {
-                            Log.v(LOG_TAG, "Forecast entry: " + s);
                         }
                     return resultStrs;
 
@@ -244,7 +234,7 @@ public class ForecastFragment extends Fragment {
             String forecastJsonStr = null;
             String format = "json";
             String units = "metric";
-            int numDays = 14; //Determines the amount of days displayed on screen at one time
+            int numDays = 7; //Determines the amount of days displayed on screen at one time
 
             try {
                 final String FORECAST_BASE_URL = "http://api.openweathermap.org/data/2.5/forecast/daily?q=Trinidad,TT";
@@ -259,19 +249,11 @@ public class ForecastFragment extends Fragment {
                         .appendQueryParameter(DAYS_PARAM, Integer.toString(numDays))
                         .build();
                 URL url = new URL(builtUri.toString());
-                Log.v(LOG_TAG, "Built URI " + builtUri.toString());
-
-                System.out.println("URL Connection created");
 
                 // Create the request to OpenWeatherMap, and open the connection
                 urlConnection = (HttpURLConnection) url.openConnection();
-                System.out.println("URL Connection opened");
-
                 urlConnection.setRequestMethod("GET");
-                System.out.println("Set URL Connection method");
-
                 urlConnection.connect();
-                System.out.println("System is connected");
 
                 // Read the input stream into a String
                 InputStream inputStream = urlConnection.getInputStream();
@@ -283,9 +265,7 @@ public class ForecastFragment extends Fragment {
                 }
 
                 reader = new BufferedReader(new InputStreamReader(inputStream));
-                System.out.println("Reader Instantiated");
                 String line;
-                System.out.println("System Instantiated.");
                 while ((line = reader.readLine()) != null)
                 {
                     // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
@@ -300,14 +280,11 @@ public class ForecastFragment extends Fragment {
                     return null;
                 }
                 forecastJsonStr = buffer.toString();
-                Log.v(LOG_TAG, "Forecast JSON String: " + forecastJsonStr);
-
             }
 
             catch (IOException e)
             {
                 Log.e("PlaceholderFragment", "Error ", e);
-                System.out.println("Exception thrown. Errors logged");
                 // If the code didn't successfully get the weather data, there's no point in attempting
                 // to parse it.
                 forecastJsonStr = null;
@@ -336,8 +313,6 @@ public class ForecastFragment extends Fragment {
                 Log.e(LOG_TAG, e.getMessage(), e);
                 e.printStackTrace();
             }
-
-            System.out.println("Error parsing data. It didn't work");
             //This will only happen if there was an error getting or parsing the forecast.
             return null;
         }
@@ -350,7 +325,6 @@ public class ForecastFragment extends Fragment {
             if(result != null)
             {
                 mForecastAdapter.clear();
-                System.out.println("mForecastAdapter cleared");
                 for(String dayForecastStr : result) {
                     mForecastAdapter.add(dayForecastStr);
                 }
